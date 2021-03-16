@@ -60,10 +60,9 @@ def precipitation():
         item_dict['prcp'] = item[1]
         precip_all.append(item_dict)
 
-    return(jsonify(precip_all))
+    return jsonify(precip_all)
 
 #####################################################
-
 # Station Route - Results
 @app.route("/api/v1.0/stations")
 def stations():
@@ -86,22 +85,29 @@ def stations():
 
     return jsonify(stations)
 
-    ##################################################
+##################################################
 
-@app.route("/api/v1.0/tobs'>Temperature Observations")
+
+@app.route("/api/v1.0/tobs")
 def tobs():
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
-    # Query all countries' invoice totals
-    results = session.query(Measurement.station, Measurement.date, Measurement.tobs).filter(Measurement.station == 'USC00519281').filter().scalar()
+    # Query similar to jupyter notebook, copy & paste!
+    results = session.query(Measurement.station, Measurement.date, Measurement.tobs).filter(Measurement.station == 'USC00519281').filter(Measurement.date >= '2016-08-24').order_by(Measurement.date).all()
 
     session.close()
 
     # Create a dictionary from the results
-    item_dict = {'country':value, 'total':float(results)}
+    tobs = []
+    for item in results:
+        tobs_dict = {}
+        tobs_dict['station'] = item[0]
+        tobs_dict['date'] = item[1]
+        tobs_dict['tobs'] = item[2]
+        tobs.append(tobs_dict)
 
-    return jsonify([item_dict])
+    return jsonify(tobs)
 
 
 
