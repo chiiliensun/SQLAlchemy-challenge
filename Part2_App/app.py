@@ -76,18 +76,18 @@ def stations():
 
     # Return a JSON list of stations from the dataset
     # create a dictionary
-    stations = []
+    station_list = []
     for item in results:
         station_dict = {}
         station_dict['station'] = item[0]
         station_dict['name'] = item[1]
-        stations.append(station_dict)
+        station_list.append(station_dict)
 
-    return jsonify(stations)
+    return jsonify(station_list)
 
-##################################################
+#####################################################
 
-
+# Temperature Observation Route - Results
 @app.route("/api/v1.0/tobs")
 def tobs():
     # Create our session (link) from Python to the DB
@@ -99,19 +99,38 @@ def tobs():
     session.close()
 
     # Create a dictionary from the results
-    tobs = []
+    tobs_list = []
     for item in results:
         tobs_dict = {}
         tobs_dict['station'] = item[0]
         tobs_dict['date'] = item[1]
         tobs_dict['tobs'] = item[2]
-        tobs.append(tobs_dict)
+        tobs_list.append(tobs_dict)
 
-    return jsonify(tobs)
+    return jsonify(tobs_list)
 
+#####################################################
 
+# Start Temperature Date Route - Results
+@app.route("/api/v1.0/<start>")
+def start_temp(start):
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
 
+    results = session.query(Measurement.date, func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)).filter(Measurement.date >= start).group_by(Measurement.date).order_by(Measurement.date).all()
 
+    session.close()
+
+    start_temp_list = []
+    for item in results:
+        start_temp_dict = {}
+        start_temp_dict["date"] = item[0]
+        start_temp_dict["max"] = item[1]
+        start_temp_dict["min"] = item[2]
+        start_temp_dict["avg"] = item[3]
+        start_temp_list.append(start_temp_dict)
+
+    return jsonify(start_temp_list)
 
 
 
