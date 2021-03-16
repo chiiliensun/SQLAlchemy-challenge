@@ -117,11 +117,14 @@ def start_temp(start):
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
+    # query and variable
     first_date = ('2016, 08, 23')
     results = session.query(Measurement.date, func.max(Measurement.tobs), func.min(Measurement.tobs), func.avg(Measurement.tobs)).filter(Measurement.date >= first_date).group_by(Measurement.date).order_by(Measurement.date).all()
 
     session.close()
 
+    # Return a JSON list of date, min, max, and avg from the dataset
+    # create a dictionary
     start_temp_list = []
     for date, max, min, avg in results:
         start_temp_dict = {}
@@ -134,9 +137,31 @@ def start_temp(start):
     return jsonify(start_temp_list)
 
 
+@app.route("/api/v1.0/<start>/<end>")
+def range_temp(start, end):
 
+# Create our session (link) from Python to the DB
+    session = Session(engine)
 
+    # query and variable
+    start_date = ('2016, 08, 23')
+    end_date = ('2017, 08, 23')
+    results = session.query(Measurement.date, func.max(Measurement.tobs), func.min(Measurement.tobs), func.avg(Measurement.tobs)).filter(Measurement.date >= start_date).filter(Measurement.date <= end_date).group_by(Measurement.date).order_by(Measurement.date).all()
 
+    session.close()
+
+    # Return a JSON list of date, min, max, and avg from the dataset
+    # create a dictionary
+    range_list = []
+    for date, max, min, avg in results:
+        range_dict = {}
+        range_dict["date"] = date
+        range_dict["max"] = max
+        range_dict["min"] = min
+        range_dict["avg"] = avg
+        range_list.append(range_dict)
+
+    return jsonify(range_list)
 
 
 
