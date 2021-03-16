@@ -1,3 +1,4 @@
+# List all routes that are available.
 import numpy as np
 
 import sqlalchemy
@@ -16,8 +17,8 @@ Base = automap_base()
 Base.prepare(engine, reflect=True)
 
 # Save references to the tables
-measurement = Base.classes.measurement
-stations = Base.classes.stations
+Measurement = Base.classes.measurement
+Station = Base.classes.station
 
 #################################################
 # Flask Setup
@@ -33,20 +34,94 @@ def welcome():
     """List all available api routes."""
     return (
         f"Available Routes:<br/>"
-        f"<a href='/api/v1.0/billingcountry'>billingcountry</a><br/>"
-        f"<a href='/api/v1.0/countrytotal'>countrytotal</a><br/>"
-        f"<a href='/api/v1.0/postcodes/USA'>postcodes/USA</a><br/>"
-        f"<a href='/api/v1.0/countryitemtotals/USA'>countryitemtotals/USA</a><br/>"
-        f"<a href='/api/v1.0/postcodeitemtotals/USA'>postcodeitemtotals/USA</a><br/>"
+        f"<a href='/api/v1.0/precipitation'>Precipitation</a><br/>"
+        f"<a href='/api/v1.0/stations'>Stations</a><br/>"
+        f"<a href='/api/v1.0/tobs'>Temperature Observations</a><br/>"
+        f"<a href='/api/v1.0/<start>'>Start Temperature</a><br/>"
+        f"<a href='/api/v1.0/<start>/<end>'>Date Range</a><br/>"
     )
 
-@app.route("/api/v1.0/billingcountry")
-def billingcountry():
+# Precipitation Route - Results
+@app.route("/api/v1.0/precipitation")
+def precipitation():
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
-    # Query all countries in billing history
-    results = session.query(Invoices.BillingCountry).group_by(Invoices.BillingCountry).all()
-
+    # Convert the query results to a dictionary using date as the key and prcp as the value.
+    results = session.query(Measurement.date, Measurement.prcp).all()
 
     session.close()
+
+    # create a dictionary from the row data and append to a list of all_results
+    precip_all = []
+    for item in results:
+        item_dict = {}
+        item_dict['date'] = item[0]
+        item_dict['prcp'] = item[1]
+        precip_all.append(item_dict)
+
+    return(jsonify(precip_all))
+
+#####################################################
+
+# Station Route - Results
+@app.route("/api/v1.0/stations")
+def stations():
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
+
+    # Query results
+    results = session.query(Station.station, Station.name).all()
+
+    session.close()
+
+    # Return a JSON list of stations from the dataset
+    # create a dictionary
+    stations = []
+    for item in results:
+        station_dict = {}
+        station_dict['station'] = item[0]
+        station_dict['name'] = item[1]
+        stations.append(station_dict)
+
+    return jsonify(stations)
+
+    ##################################################
+
+@app.route("/api/v1.0/countryitemtotals/<value>")
+def countryitemtotals(value):
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
+
+    # Query all countries' invoice totals
+    results = session.query(func.sum(Items.UnitPrice * Items.Quantity)).filter(Invoices.InvoiceId == Items.InvoiceId).filter(Invoices.BillingCountry == value).scalar()
+
+    session.close()
+
+    # Create a dictionary from the results
+    item_dict = {'country':value, 'total':float(results)}
+
+    return jsonify([item_dict])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
