@@ -117,17 +117,18 @@ def start_temp(start):
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
-    results = session.query(Measurement.date, func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)).filter(Measurement.date >= start).group_by(Measurement.date).order_by(Measurement.date).all()
+    first_date = ('2016, 08, 23')
+    results = session.query(Measurement.date, func.max(Measurement.tobs), func.min(Measurement.tobs), func.avg(Measurement.tobs)).filter(Measurement.date >= first_date).group_by(Measurement.date).order_by(Measurement.date).all()
 
     session.close()
 
     start_temp_list = []
-    for item in results:
+    for date, max, min, avg in results:
         start_temp_dict = {}
-        start_temp_dict["date"] = item[0]
-        start_temp_dict["max"] = item[1]
-        start_temp_dict["min"] = item[2]
-        start_temp_dict["avg"] = item[3]
+        start_temp_dict["date"] = date
+        start_temp_dict["max"] = max
+        start_temp_dict["min"] = min
+        start_temp_dict["avg"] = avg
         start_temp_list.append(start_temp_dict)
 
     return jsonify(start_temp_list)
