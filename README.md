@@ -45,7 +45,7 @@ The next step I designed a query to retrieve the last 12 months of temperature o
  Now that I have completed the initial analysis, I have designed a Flask API based on my developed queries. I used the below Routes.
 
 #### Routes
-* `/`
+* "`/`"
 
   * Home page.
 
@@ -53,7 +53,7 @@ The next step I designed a query to retrieve the last 12 months of temperature o
 
   ![landingpage.png](Images/landingpage.png)
 
-* `/api/v1.0/precipitation`
+* "`/api/v1.0/precipitation`""
 
   * Converted the query results to a dictionary using `date` as the key and `prcp` as the value.
 
@@ -61,20 +61,20 @@ The next step I designed a query to retrieve the last 12 months of temperature o
 
   ![precippage.png](Images/precippage.png)
 
-* `/api/v1.0/stations`
+* "`/api/v1.0/stations`"
 
   * Return a JSON list of stations from the dataset.
 
   ![stationpage.png](Images/stationpage.png)
 
-* `/api/v1.0/tobs`
+* "`/api/v1.0/tobs`"
   * Query the dates and temperature observations of the most active station for the last year of data.
 
   * Return a JSON list of temperature observations (TOBS) for the previous year.
 
   ![tempobspage.png](Images/tempobspage.png)
 
-* `/api/v1.0/<start>` and `/api/v1.0/<start>/<end>`
+* "`/api/v1.0/<start>` and `/api/v1.0/<start>/<end>`"
 
   * Return a JSON list of the minimum temperature, the average temperature, and the max temperature for a given start or start-end range.
 
