@@ -88,13 +88,13 @@ def stations():
 
     ##################################################
 
-@app.route("/api/v1.0/countryitemtotals/<value>")
-def countryitemtotals(value):
+@app.route("/api/v1.0/tobs'>Temperature Observations")
+def tobs():
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
     # Query all countries' invoice totals
-    results = session.query(func.sum(Items.UnitPrice * Items.Quantity)).filter(Invoices.InvoiceId == Items.InvoiceId).filter(Invoices.BillingCountry == value).scalar()
+    results = session.query(Measurement.station, Measurement.date, Measurement.tobs).filter(Measurement.station == 'USC00519281').filter().scalar()
 
     session.close()
 
